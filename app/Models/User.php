@@ -27,6 +27,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'profile_photo_path',
     ];
 
     /**
@@ -58,4 +60,33 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function getRolAttribute(): string{
+        return match($this->role) {
+            'admin' => 'Administrador',
+            'client' => 'Cliente',
+            'seller' => 'Vendedor',
+            default => 'sin Rol',
+        };
+    }
+
+    public function getImageUserAttribute(){
+        return $this->profile_photo_path ?? 'img/default-user.png';
+    }
+
+    public function scopeSearch($query, $term){
+        if($term === ''){
+            return;
+        }
+
+        return $query->where('name', 'like', "{$term}%")
+                     ->orWhere('email', 'like', "{$term}%");
+    }
+
+    public function scopeByRole($query, $role){
+        if ($role === ''){
+            return;
+        }
+        return $query->where('role', $role);
+    }
 }
