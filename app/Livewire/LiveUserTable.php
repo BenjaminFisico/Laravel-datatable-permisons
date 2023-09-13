@@ -13,13 +13,20 @@ class LiveUserTable extends Component
     public $perPage = 5;
     public $sortableColumn = null;
     public $sortableOrder = null;
+    public $userRoleFilter = '';
     public $icon = 'circle';
-
+    public $showModal = 'hidden';
+    // url get params
     protected $queryString = [
         'search',
         'perPage',
         'sortableColumn' => ['as' => 'column'],
         'sortableOrder' => ['as' => 'order']
+    ];
+
+    protected $listeners = [
+        'reloadTable' => 'reloadTable',
+        'deleteUser' => 'deleteUser'
     ];
 
     public function render(){
@@ -29,8 +36,8 @@ class LiveUserTable extends Component
     }
 
     private function getDbUserData(){
-        $users = User::where('name', 'like', "{$this->search}%")
-        ->orWhere('email', 'like', "{$this->search}%");
+        $users = User::search($this->search)
+            ->byRole($this->userRoleFilter);
 
         if($this->sortableOrder && $this->sortableColumn){
             $users = $users->orderBy($this->sortableColumn, $this->sortableOrder);
@@ -39,10 +46,6 @@ class LiveUserTable extends Component
         $users = $users->paginate($this->perPage);
 
         return $users;
-    }
-
-    public function mount(){
-        $this->icon = $this->setIconDirection($this->sortableOrder);
     }
 
     public function sortable($column){
@@ -70,6 +73,10 @@ class LiveUserTable extends Component
         }
     }
 
+    public function mount(){
+        $this->icon = $this->setIconDirection($this->sortableOrder);
+    }
+
     private function setIconDirection($sort){
         if(!$sort){
             return 'circle';
@@ -78,12 +85,23 @@ class LiveUserTable extends Component
         return $sort == 'asc' ? 'arrow-circle-up' : 'arrow-circle-down';
     }
 
+    public function showEditModal(User $user){
+        if($user->name != null){
+            $this->dispatch('showModal', $user);
+        } else {
+            $this->dispatch('showModalNewUser');
+        }
+    }
+
+    public function deleteUser(User $user){
+        $userName = $user->name;
+        $user->delete();
+
+        $this->dispatch('deleteIsOk', userName: $userName);
+    }
+
     public function clearFilters(){
-        $this->search = '';
-        $this->sortableColumn = null;
-        $this->sortableOrder = null;
-        $this->perPage = 5;
-        $this->reloadTable();
+        $this->reset();
     }
 
     public function reloadTable(){
