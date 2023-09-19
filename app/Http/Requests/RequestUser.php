@@ -4,8 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
 
-class RequestUpdateUser extends FormRequest
+class RequestUser extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +23,11 @@ class RequestUpdateUser extends FormRequest
      */
     public function rules($user): array
     {
+        $roles = $this->getAllRolesString();
         $rules = [
             'name'=>'required|min:3|max:30',
             'email'=>['required','email', Rule::unique('users','email')->ignore($user)],
-            'role' => 'required|in:admin,client,seller',
+            'role' => "required|in:{$roles}",
             'profile_photo_path' => 'nullable|image'
         ];
 
@@ -38,6 +40,11 @@ class RequestUpdateUser extends FormRequest
         }
 
         return $rules;
+    }
+
+    private function getAllRolesString(): string{
+        $roles = Role::pluck('name');
+        return $roles->join(',');
     }
 
     public function messages(): array{
