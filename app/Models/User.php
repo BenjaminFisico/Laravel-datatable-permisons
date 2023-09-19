@@ -9,9 +9,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    use HasRoles;
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
@@ -27,7 +29,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
         'profile_photo_path',
     ];
 
@@ -61,15 +62,6 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-    public function getRolAttribute(): string{
-        return match($this->role) {
-            'admin' => 'Administrador',
-            'client' => 'Cliente',
-            'seller' => 'Vendedor',
-            default => 'sin Rol',
-        };
-    }
-
     public function getImageUserAttribute(){
         return $this->profile_photo_path ?? 'img/default-user.png';
     }
@@ -81,12 +73,5 @@ class User extends Authenticatable
 
         return $query->where('name', 'like', "{$term}%")
                      ->orWhere('email', 'like', "{$term}%");
-    }
-
-    public function scopeByRole($query, $role){
-        if ($role === ''){
-            return;
-        }
-        return $query->where('role', $role);
     }
 }

@@ -25,7 +25,14 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('/user/list', [UserController::class, 'list'])->name('user.list');
+    Route::get('user/list', [UserController::class, 'list'])->name('user.list')
+    ->middleware('can:user read');
+    Route::view('role/list', 'role.list')->name('role.list')
+    ->middleware('can:role read');
+    Route::view('seller/list', 'seller.list')->name('seller.list')
+    ->middleware('can:seller read');
+    Route::view('client/list', 'client.list')->name('client.list')
+    ->middleware('can:client read');
 });
 
 

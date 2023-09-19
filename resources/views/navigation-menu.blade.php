@@ -15,9 +15,26 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link href="{{ route('user.list') }}" :active="request()->routeIs('user.list')">
-                        {{ __('usuarios') }}
-                    </x-nav-link>
+                    @can('user read')
+                        <x-nav-link href="{{ route('user.list') }}" :active="request()->routeIs('user.list')">
+                            {{ __('usuarios') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('client read')
+                        <x-nav-link href="{{ route('client.list') }}" :active="request()->routeIs('client.list')">
+                            {{ __('clientes') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('seller read')
+                        <x-nav-link href="{{ route('seller.list') }}" :active="request()->routeIs('seller.list')">
+                            {{ __('vendedores') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('role read')
+                        <x-nav-link href="{{ route('role.list') }}" :active="request()->routeIs('role.list')">
+                            {{ __('roles y permisos') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 

@@ -12,13 +12,15 @@ class ComponentSelectInput extends Component
     public string $inputName = '';
     public string $functionOnChange = '';
     public array $options = [];
+    public string $firstOption = '';
     
-    public function __construct(string $label, string $inputName, array $options, string $functionOnChange = '')
+    public function __construct(string $label, string $inputName, array $options, string $functionOnChange = '', string $firstOption = '')
     {
         $this->label = $label;
         $this->inputName = $inputName;
         $this->options = $options;
         $this->functionOnChange = $functionOnChange;
+        $this->firstOption = $firstOption;
     }
 
     /**

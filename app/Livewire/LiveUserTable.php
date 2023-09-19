@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use Livewire\{Component, WithPagination};
 use App\Models\User;
+use Spatie\Permission\Models\Role;
+use App\Http\controllers\UserController;
 
 class LiveUserTable extends Component
 {
@@ -16,6 +18,7 @@ class LiveUserTable extends Component
     public $userRoleFilter = '';
     public $icon = 'circle';
     public $showModal = 'hidden';
+    private $userController;
     // url get params
     protected $queryString = [
         'search',
@@ -29,15 +32,22 @@ class LiveUserTable extends Component
         'deleteUser' => 'deleteUser'
     ];
 
+    public function __construct(){
+        $this->userController = (new UserController);
+    }
+
     public function render(){
         return view('livewire.live-user-table', [
             'users' => $this->getDbUserData(),
+            'roles' => $this->getAllRoles(),
         ]);
     }
 
     private function getDbUserData(){
         $users = User::search($this->search)
-            ->byRole($this->userRoleFilter);
+            ->when($this->userRoleFilter != '', function($query){
+               return $query->role($this->userRoleFilter);
+            });
 
         if($this->sortableOrder && $this->sortableColumn){
             $users = $users->orderBy($this->sortableColumn, $this->sortableOrder);
@@ -46,6 +56,11 @@ class LiveUserTable extends Component
         $users = $users->paginate($this->perPage);
 
         return $users;
+    }
+
+    private function getAllRoles(){
+        $allRoles = Role::pluck('name', 'name')->toArray();
+        return $allRoles;
     }
 
     public function sortable($column){
@@ -87,17 +102,23 @@ class LiveUserTable extends Component
 
     public function showEditModal(User $user){
         if($user->name != null){
+            $this->userController->checkUserHasPermission('user update');
             $this->dispatch('showModal', $user);
         } else {
+            (new UserController)->checkUserHasPermission('user create');
             $this->dispatch('showModalNewUser');
         }
     }
 
     public function deleteUser(User $user){
-        $userName = $user->name;
-        $user->delete();
-
-        $this->dispatch('deleteIsOk', userName: $userName);
+        if ($this->userController->deleteUser($user)){
+            $userName = $user->name;
+            $this->dispatch('deleteIsOk', userName: $userName);
+            $this->reloadTable();
+        } else {
+            // Al no pasar 'userName' el front muestra mensaje de error
+            $this->dispatch('deleteIsOk');
+        }
     }
 
     public function clearFilters(){
@@ -106,5 +127,9 @@ class LiveUserTable extends Component
 
     public function reloadTable(){
         $this->resetPage();
+    }
+
+    public function addPermission(User $user){
+        $this->dispatch('showAddPermissionModal', $user, 'user');
     }
 }

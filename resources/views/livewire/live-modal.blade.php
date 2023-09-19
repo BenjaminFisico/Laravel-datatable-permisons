@@ -10,9 +10,8 @@
                         <x-component-input placeholder="Ingrese un nombre" inputName="name" label="Nombre"></x-component-input>
                         <x-component-input placeholder="Ingrese un email" inputName="email" label="Email"></x-component-input>
                         <x-component-select-input inputName="role" label="Rol"
-                        :options="['admin' => 'Administrador',
-                                    'client' => 'Cliente',
-                                    'seller' => 'Vendedor']">
+                        firstOption="selecione un rol"
+                        :options="$roles">
                         </x-component-select-input>
                         <x-component-input placeholder="Ingrese una imagen" inputName="profile_photo_path" label="Imagen" type="file"></x-component-input>
                         @if($action == 'Guardar')

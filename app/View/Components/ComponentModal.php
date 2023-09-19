@@ -9,12 +9,14 @@ use Illuminate\View\Component;
 class ComponentModal extends Component
 {
     public $showModal;
-    public $action = '';
+    public $action;
+    public $closeText;
 
-    public function __construct(string $showModal, string $action)
+    public function __construct(string $showModal, string $action = '', string $closeText = '')
     {
         $this->showModal = $showModal;
         $this->action = $action;
+        $this->closeText = $closeText;
     }
 
     /**
