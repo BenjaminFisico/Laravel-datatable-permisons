@@ -6,3 +6,10 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
+<hr>
+<h2>✨ Proposito ✨</h2>
+<p>El propósito de este proyecto es el de crear un sistema que sirva como base para crear sistemas más grandes.
+Por sí solo este proyecto trae las siguientes funcionalidades ⬇️⬇️⬇️ </p>
+<ul>
+    <li>Registro y login de usuarios. 👌</li>
+</ul>
